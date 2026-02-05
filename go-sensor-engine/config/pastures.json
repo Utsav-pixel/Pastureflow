@@ -1,0 +1,125 @@
+{
+  "tick_ms": 10,
+  "zones": [
+    {
+      "id": "zone-1",
+      "area_hectares": 10.0,
+      "lat": 0.0,
+      "lon": 0.0,
+      "initial_biomass": 0.5,
+      "initial_soil_moisture": 0.6,
+      "initial_animal_load": 7,
+      "regen_rate": 0.01,
+      "degrade_rate": 0.02,
+      "evap_rate": 0.005
+    },
+    {
+      "id": "zone-2",
+      "area_hectares": 15.5,
+      "lat": 1.2,
+      "lon": -0.5,
+      "initial_biomass": 0.7,
+      "initial_soil_moisture": 0.4,
+      "initial_animal_load": 12,
+      "regen_rate": 0.015,
+      "degrade_rate": 0.018,
+      "evap_rate": 0.008
+    },
+    {
+      "id": "zone-3",
+      "area_hectares": 8.0,
+      "lat": -0.8,
+      "lon": 1.5,
+      "initial_biomass": 0.3,
+      "initial_soil_moisture": 0.8,
+      "initial_animal_load": 5,
+      "regen_rate": 0.008,
+      "degrade_rate": 0.025,
+      "evap_rate": 0.003
+    },
+    {
+      "id": "zone-4",
+      "area_hectares": 20.0,
+      "lat": 2.1,
+      "lon": 2.0,
+      "initial_biomass": 0.9,
+      "initial_soil_moisture": 0.5,
+      "initial_animal_load": 18,
+      "regen_rate": 0.02,
+      "degrade_rate": 0.015,
+      "evap_rate": 0.01
+    },
+    {
+      "id": "zone-5",
+      "area_hectares": 12.3,
+      "lat": -1.5,
+      "lon": -1.2,
+      "initial_biomass": 0.4,
+      "initial_soil_moisture": 0.7,
+      "initial_animal_load": 9,
+      "regen_rate": 0.012,
+      "degrade_rate": 0.022,
+      "evap_rate": 0.006
+    },
+    {
+      "id": "zone-6",
+      "area_hectares": 18.7,
+      "lat": 3.0,
+      "lon": -2.1,
+      "initial_biomass": 0.6,
+      "initial_soil_moisture": 0.3,
+      "initial_animal_load": 15,
+      "regen_rate": 0.018,
+      "degrade_rate": 0.02,
+      "evap_rate": 0.012
+    },
+    {
+      "id": "zone-7",
+      "area_hectares": 6.5,
+      "lat": -2.3,
+      "lon": 0.8,
+      "initial_biomass": 0.8,
+      "initial_soil_moisture": 0.9,
+      "initial_animal_load": 4,
+      "regen_rate": 0.006,
+      "degrade_rate": 0.012,
+      "evap_rate": 0.002
+    },
+    {
+      "id": "zone-8",
+      "area_hectares": 25.0,
+      "lat": 1.8,
+      "lon": 3.2,
+      "initial_biomass": 0.2,
+      "initial_soil_moisture": 0.45,
+      "initial_animal_load": 22,
+      "regen_rate": 0.025,
+      "degrade_rate": 0.028,
+      "evap_rate": 0.015
+    },
+    {
+      "id": "zone-9",
+      "area_hectares": 14.2,
+      "lat": -0.3,
+      "lon": -2.8,
+      "initial_biomass": 0.75,
+      "initial_soil_moisture": 0.65,
+      "initial_animal_load": 11,
+      "regen_rate": 0.014,
+      "degrade_rate": 0.019,
+      "evap_rate": 0.007
+    },
+    {
+      "id": "zone-10",
+      "area_hectares": 9.8,
+      "lat": 2.5,
+      "lon": 1.1,
+      "initial_biomass": 0.55,
+      "initial_soil_moisture": 0.55,
+      "initial_animal_load": 8,
+      "regen_rate": 0.011,
+      "degrade_rate": 0.021,
+      "evap_rate": 0.009
+    }
+  ]
+}
