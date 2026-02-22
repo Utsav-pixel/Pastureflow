@@ -22,24 +22,24 @@ type PastureZone struct {
 }
 
 type Telemetry struct {
-	ZoneID    string
-	Timestamp time.Time
-	Metrics   Metrics
-	Quality   Quality
+	ZoneID    string    `json:"zone_id"`
+	Timestamp time.Time `json:"ts"`
+	Metrics   Metrics   `json:"metrics"`
+	Quality   Quality   `json:"quality"`
 }
 
 type Metrics struct {
-	Biomass      float64
-	SoilMoisture float64
-	Temperature  float64
-	AnimalLoad   int
+	Biomass      float64 `json:"biomass"`
+	SoilMoisture float64 `json:"soil_moisture"`
+	Temperature  float64 `json:"temperature"`
+	AnimalLoad   int     `json:"animal_load"`
 }
 
 func (z *PastureZone) Tick(now time.Time) Telemetry {
 	z.Temperature = ComputeTemperature(25.0, now)
-
+	dt := float64(now.Unix()) / 1000.0
 	z.SoilMoisture, _ = UpdateSoilMoisture(z.SoilMoisture, z.Temperature, z.EvapRate)
-	z.Biomass = UpdateBiomass(z.Biomass, z.RegenRate, z.DegradeRate, z.AnimalLoad, z.SoilMoisture, z.Temperature)
+	z.Biomass = UpdateBiomass(z.Biomass, z.RegenRate, z.DegradeRate, z.AnimalLoad, z.SoilMoisture, z.Temperature, dt)
 
 	quality := DetermineQuality()
 

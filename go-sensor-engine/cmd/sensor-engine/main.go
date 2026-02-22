@@ -14,33 +14,43 @@ import (
 )
 
 func main() {
+	totalPublished := 0
+	totalBatchesSent := 0
+	start := time.Now()
 
 	tickerInterval, zones := ReadPastureZones()
-	telemetry_chan := make(chan sim.Telemetry, len(zones[:4]))
+	telemetry_chan := make(chan sim.Telemetry, len(zones))
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	for i := range zones[:3] {
+	for i := range zones {
 		zone := &zones[i]
-		go runZoneScheduler(ctx, zone, tickerInterval, telemetry_chan)
+		go runZoneScheduler(ctx, zone, tickerInterval, telemetry_chan, &totalPublished)
 	}
-	go consumeTelemetry(ctx, telemetry_chan)
+	go consumeTelemetry(ctx, telemetry_chan, &totalBatchesSent)
 	// Use tickerInterval to avoid unused variable warning
 	<-ctx.Done()
+
 	fmt.Println("Context cancelled or expired")
 	fmt.Printf("Ticker interval: %v\n", tickerInterval)
-
+	fmt.Printf("Total time taken: %v\n", time.Since(start))
+	fmt.Printf("Total published messages: %d\n", totalPublished)
+	fmt.Printf("Total batches sent to Kafka: %d\n", totalBatchesSent)
+	if totalBatchesSent > 0 {
+		fmt.Printf("Average messages per batch: %.1f\n", float64(totalPublished)/float64(totalBatchesSent))
+	}
 }
 
-func runZoneScheduler(ctx context.Context, zone *sim.PastureZone, tickerInterval time.Duration, out chan<- sim.Telemetry) {
+func runZoneScheduler(ctx context.Context, zone *sim.PastureZone, tickerInterval time.Duration, out chan<- sim.Telemetry, totalPublished *int) {
 	ticker := time.NewTicker(tickerInterval)
 	defer ticker.Stop()
 	for {
 		select {
 		case <-ticker.C:
 			produced := zone.Tick(time.Now())
-			fmt.Printf("Produced telemetry for zone %s at %v-------%v\n", produced.ZoneID, produced.Timestamp, produced.Metrics.Temperature)
+			// No logging - pure performance
 			out <- produced
+			*totalPublished++
 		case <-ctx.Done():
 			return
 		}
@@ -109,24 +119,58 @@ func ReadPastureZones() (tickerInterval time.Duration, zones []sim.PastureZone) 
 	return tickerInterval, zones
 }
 
-func consumeTelemetry(ctx context.Context, in <-chan sim.Telemetry) {
+func consumeTelemetry(ctx context.Context, in <-chan sim.Telemetry, totalBatchesSent *int) {
 	// pub := publisher.NewHTTPPublisher("https://webhook.site/dc4fff2a-f1a9-4fab-96f4-1fb0f6f97182")
 	pub := publisher.NewKafkaPublisher([]string{"localhost:9092"}, "pasture.telemetry.v1")
 	defer pub.Close()
+
+	batch := make([]sim.Telemetry, 0, 1000)
+	batchTicker := time.NewTicker(100 * time.Millisecond)
+	defer batchTicker.Stop()
+
 	for {
 		select {
 		case telemetry := <-in:
+			batch = append(batch, telemetry)
 
-			// formatPrint(telemetry)
-			// pub.Publish(ctx, telemetry)
-			if err := pub.Publish(ctx, telemetry); err != nil {
-				fmt.Printf("Error publishing telemetry: %v\n", err)
+			// Publish batch if it reaches the size limit
+			if len(batch) >= 1000 {
+				// No logging - pure performance
+				if err := pub.PublishBatch(ctx, batch); err != nil {
+					// Silent error handling for max performance
+				} else {
+					*totalBatchesSent++
+				}
+				batch = batch[:0] // Clear the batch
 			}
+
+		case <-batchTicker.C:
+			// Publish any remaining messages in the batch
+			if len(batch) > 0 {
+				// No logging - pure performance
+				if err := pub.PublishBatch(ctx, batch); err != nil {
+					// Silent error handling for max performance
+				} else {
+					*totalBatchesSent++
+				}
+				batch = batch[:0] // Clear the batch
+			}
+
 		case <-ctx.Done():
+			// Publish any remaining messages before exiting
+			if len(batch) > 0 {
+				// No logging - pure performance
+				if err := pub.PublishBatch(ctx, batch); err != nil {
+					// Silent error handling for max performance
+				} else {
+					*totalBatchesSent++
+				}
+			}
 			return
 		}
 	}
 }
+
 func formatPrint(telemetry sim.Telemetry) {
 	buf := make([]byte, 0, 256)
 	buf = append(buf, "ts="...)

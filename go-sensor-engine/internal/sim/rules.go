@@ -57,19 +57,19 @@ func UpdateBiomass(
 	animalLoad int,
 	soilMoisture float64,
 	temperature float64,
+	dt float64,
 ) float64 {
 
-	regrowth := 0.5
+	regrowth := 0.0
 
 	if soilMoisture > 0.3 {
-		regrowth = regenRate // Grass only growths if moisture is sufficient
+		regrowth = regenRate * (1 - current)
 
-		//Heat stress
 		if temperature > 35 {
 			regrowth *= 0.5
 		}
 	}
-	grazingImpact := float64(animalLoad) * degradeRate
+	grazingImpact := float64(animalLoad) * degradeRate * current
 
 	return clamp(current + regrowth - grazingImpact)
 }
